@@ -76,6 +76,25 @@ Build a Flutter app with intentional performance problems, then clean it up with
 
 ---
 
+## 🧩 Tech Stack
+
+- **Languages:** Dart for app logic and UI, with performance-focused Flutter widgets
+- **Framework:** Flutter for cross-platform mobile UI
+- **Tools:** VS Code / Android Studio, Git, Flutter SDK, Flutter DevTools
+- **Storage / State:** Local in-memory state, `setState`, and `ValueNotifier` for targeted updates
+
+---
+
+## ✨ Core Functionality
+
+- **Performance Audit:** Simulates and profiles common Flutter performance issues
+- **Stock List View:** Displays 100 fake stocks in a scrollable list
+- **Stock Detail View:** Opens a detail screen with a fake chart and computed data
+- **Portfolio Summary:** Shows holdings, values, and a simple portfolio overview
+- **Optimization Workflow:** Demonstrates before/after improvements using Flutter DevTools metrics
+
+---
+
 ## 🚀 Getting Started
 
 ### 📦 Prerequisites
