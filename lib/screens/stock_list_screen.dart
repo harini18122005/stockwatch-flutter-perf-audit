@@ -17,8 +17,7 @@ class _StockListScreenState extends State<StockListScreen> {
   List<Stock> filteredStocks = [];
   final TextEditingController searchController = TextEditingController();
 
-  // 🐛 BUG 3: Calling setState on every scroll event
-  // ✅ CLEAN VERSION WAS: Normal scroll behavior (no ScrollController needed for setState)
+  // ScrollController is fine to keep, but we removed the performance-killing listener
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -27,13 +26,17 @@ class _StockListScreenState extends State<StockListScreen> {
     // Initially show all stocks
     filteredStocks = fakeStocks;
 
-    // 🐛 BUG 3 Listener: Triggers a rebuild on every single pixel scrolled
+    // ✅ FIX 3: Removed unnecessary setState from scroll listener 
+    // 💡 WHY: Calling setState on every scroll frame (60+ times/sec) 
+    // causes a "rebuild storm" that drops the FPS. 
+    // Since we aren't changing any UI state based on scroll position, 
+    // we don't need a listener at all.
+    /*
+    // 🐛 BEFORE (Bad):
     _scrollController.addListener(() {
-      setState(() {
-        // This empty setState forces the whole widget tree to rebuild 
-        // 60-120 times per second during scrolling!
-      });
+      setState(() { }); // Rebuilds the whole screen 60 times a second!
     });
+    */
   }
 
   @override
@@ -85,8 +88,6 @@ class _StockListScreenState extends State<StockListScreen> {
           Expanded(
             // ✅ FIX 1: Using ListView.builder for lazy loading
             // This efficiently builds only the tiles currently visible on the screen.
-            // As the user scrolls, Flutter 'recycles' or builds new tiles, 
-            // saving massive amounts of memory compared to the standard ListView.
             
             // 💡 HOW IT WORKS: 
             // Instead of building 100 tiles at once in memory, 
