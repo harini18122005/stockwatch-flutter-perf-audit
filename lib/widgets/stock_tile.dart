@@ -15,15 +15,20 @@ class StockTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🐛 BUG 4: Removed const constructors — forces unnecessary rebuilds
-    // ✅ CLEAN VERSION WAS: Using 'const' for EdgeInsets, TextStyle, SizedBox, etc.
+    // ✅ FIX 4: Added const constructors to prevent unnecessary rebuilds
+    // 💡 WHY IT WORKS: 
+    // Small widgets like EdgeInsets, TextStyle, and SizedBox never change.
+    // By adding 'const', Flutter 'remembers' them and never has to rebuild them 
+    // from scratch, saving CPU cycles on every frame!
+
     return ListTile(
       onTap: onTap,
-      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       // Stock Name and Symbol
       title: Text(
         stock.name,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),
@@ -35,6 +40,7 @@ class StockTile extends StatelessWidget {
           fontSize: 14,
         ),
       ),
+      
       // Stock Price and Change Badge
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -43,15 +49,16 @@ class StockTile extends StatelessWidget {
           // Current Price
           Text(
             '₹${stock.price.toStringAsFixed(2)}',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
+          
           // Change Percentage Badge
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: stock.isUp ? Colors.green[100] : Colors.red[100],
               borderRadius: BorderRadius.circular(4),
