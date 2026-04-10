@@ -3,32 +3,63 @@ import '../data/fake_stocks.dart';
 
 /// Screen 2: Shows details for a single selected stock.
 /// Receives a [Stock] object via the constructor.
-class StockDetailScreen extends StatelessWidget {
+/// Now converted to StatefulWidget to demonstrate moving work out of build().
+class StockDetailScreen extends StatefulWidget {
   final Stock stock;
 
   const StockDetailScreen({super.key, required this.stock});
 
   @override
-  Widget build(BuildContext context) {
-    // 🐛 BUG 2: Heavy computation inside build() method
-    // ✅ CLEAN VERSION WAS: No heavy computation in build()
-    // Simulate heavy work — runs on every rebuild
-    double total = 0;
-    for (int i = 0; i < 1000000; i++) {
-      total += i * 0.001;
-    }
-    // We print it just to ensure the compiler doesn't optimize it away
-    debugPrint('Computation result: $total');
+  State<StockDetailScreen> createState() => _StockDetailScreenState();
+}
 
+class _StockDetailScreenState extends State<StockDetailScreen> {
+  // Variable to store the computation result
+  double computationResult = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // ✅ FIX 2: Moved heavy computation to initState()
+    // 💡 WHY IT WORKS: 
+    // initState() runs exactly ONCE when the screen is created. 
+    // build() can run many times (on rotation, keyboard open, etc.).
+    // By doing the "cooking" once here, we keep the UI thread free to draw frames.
+    
+    /* 
+    // 📖 Comparison:
+    
+    // 🐛 BEFORE (Bad - inside build):
+    @override
+    Widget build(BuildContext context) {
+      for (int i = 0; i < 1000000; i++) { ... } // Re-calculates every time!
+    }
+
+    // ✅ AFTER (Good - inside initState):
+    @override
+    void initState() {
+       performComputation(); // Calculates only once!
+    }
+    */
+
+    // Perform the heavy work once
+    for (int i = 0; i < 1000000; i++) {
+      computationResult += i * 0.001;
+    }
+    debugPrint('Computation result (Calculated in initState): $computationResult');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Generate a simple fake price history (10 items)
     final List<double> priceHistory = List.generate(
       10,
-      (index) => stock.price - (index * 5.25),
+      (index) => widget.stock.price - (index * 5.25),
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(stock.symbol),
+        title: Text(widget.stock.symbol),
         backgroundColor: Colors.blue[800],
         foregroundColor: Colors.white,
       ),
@@ -40,7 +71,7 @@ class StockDetailScreen extends StatelessWidget {
             children: [
               // Stock Header
               Text(
-                stock.name,
+                widget.stock.name,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -52,7 +83,7 @@ class StockDetailScreen extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    '₹${stock.price.toStringAsFixed(2)}',
+                    '₹${widget.stock.price.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -62,13 +93,13 @@ class StockDetailScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: stock.isUp ? Colors.green[100] : Colors.red[100],
+                      color: widget.stock.isUp ? Colors.green[100] : Colors.red[100],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '${stock.isUp ? '+' : ''}${stock.change.toStringAsFixed(2)}%',
+                      '${widget.stock.isUp ? '+' : ''}${widget.stock.change.toStringAsFixed(2)}%',
                       style: TextStyle(
-                        color: stock.isUp ? Colors.green[800] : Colors.red[800],
+                        color: widget.stock.isUp ? Colors.green[800] : Colors.red[800],
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
