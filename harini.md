@@ -1,520 +1,777 @@
-# 🗓️ Day 3 — Profile the Buggy App Using Flutter DevTools
-### Format: RTC ROS | Total Prompts: 7
+# 🗓️ Day 4 — Fix All Bugs + Final Report + Project Complete
+### Format: RTC ROS | Total Prompts: 10
 
-> **Day 3 Goal:** Open Flutter DevTools, profile all 4 bugs one by one, capture before screenshots, and record exact numbers (FPS, rebuild count, frame time). These numbers are your PROOF for the final report.
+> **Day 4 Goal:** Fix all 4 performance bugs one by one, re-profile each fix to get "after" numbers, write the final PDF findings report, update GitHub, and prepare your interview answer. By end of today — project is 100% complete.
 
 ---
 ---
 
-# 🔵 PROMPT 1 OF 7 — DevTools Setup & First Launch
+# 🔵 PROMPT 1 OF 10 — Fix Bug 1 (ListView → ListView.builder)
 
 ---
 
 ## 🎭 ROLE
-You are a **Flutter DevTools expert and performance profiling mentor**.
-You guide beginner Flutter developers through setting up Flutter DevTools for the first time.
-You explain every button, tab, and number in DevTools in very simple language — like explaining to someone who has never used a profiling tool before.
+You are an **expert Flutter performance engineer**.
+You fix real-world Flutter performance issues with clean, production-ready code.
+You explain every fix clearly — what changed, why it works, and what improvement to expect.
 
 ---
 
 ## 📋 TASK
-Help me **set up and launch Flutter DevTools** correctly for profiling my StockWatch app.
-I need to run my app in **profile mode** (not debug mode) and connect DevTools to it so I can start catching performance bugs.
+Help me **fix Bug 1** in my StockWatch Flutter app.
+
+**Bug 1 (current bad code):**
+`stock_list_screen.dart` uses `ListView` which loads all 100 stock tiles into memory at once — even items not visible on screen.
+
+**Fix to apply:**
+Replace `ListView` with `ListView.builder` so Flutter only builds tiles that are currently visible on screen (lazy loading).
 
 ---
 
 ## 🧩 CONTEXT
-- I have a Flutter app called **StockWatch** with 4 intentional performance bugs added on Day 2
-- I am on **VS Code** with Flutter plugin installed
-- I have an **Android emulator** running
-- I have never used Flutter DevTools for performance profiling before
-- I need to capture screenshots of performance problems for my internship report
+- My app is called StockWatch — a fake stock portfolio tracker
+- I am fixing this bug to compare before/after performance metrics
+- After fixing, I will re-profile in Flutter DevTools to get "after" numbers
+- I am a beginner Flutter developer — explain the fix clearly
+- File to change: `lib/screens/stock_list_screen.dart`
 
 ---
 
 ## 📏 RULES
-1. Explain the difference between **debug mode** and **profile mode** in simple terms
-2. Show the exact terminal command to run the app in profile mode
-3. Show how to open DevTools from VS Code AND from the terminal (both ways)
-4. Explain what each DevTools tab does in one line each
-5. Tell me which tabs I will use today and which ones to ignore
-6. Include screenshots descriptions of what I should see when DevTools opens correctly
+1. Show the **full updated file** — not just the changed lines
+2. Mark the fix clearly with `// ✅ FIX 1: Using ListView.builder for lazy loading`
+3. Remove the old bug comment `// 🐛 BUG 1:` and replace with the fix comment
+4. Keep Bug 3 (setState scroll) still present — fix only Bug 1 today in this step
+5. Add a comment explaining HOW `ListView.builder` works in simple English
+6. Show a side-by-side comparison of bad vs good code in comments
+7. After the code, explain the fix in 4 simple bullet points
 
 ---
 
 ## 📤 OUTPUT
 
-### Output 1 — Why Profile Mode Matters
-- Simple explanation: debug mode vs profile mode vs release mode
-- Why profiling in debug mode gives wrong/fake numbers
+### Output 1 — Before vs After (Code Comparison)
+```dart
+// 🐛 BEFORE (Bad)
+ListView(
+  children: stocks.map((s) => StockTile(stock: s)).toList(),
+)
 
-### Output 2 — Commands to Run
-```bash
-# Exact commands to type in terminal
+// ✅ AFTER (Fixed)
+ListView.builder(
+  itemCount: stocks.length,
+  itemBuilder: (context, index) => StockTile(stock: stocks[index]),
+)
 ```
-- Step by step: how to run app in profile mode
-- How to open DevTools from terminal
-- How to open DevTools from VS Code
 
-### Output 3 — DevTools Tab Guide
-A simple table:
+### Output 2 — Full Updated `lib/screens/stock_list_screen.dart`
+Complete file with Fix 1 applied, Bug 3 still present
 
-| Tab | What it does | Use today? |
-|---|---|---|
-| Performance | Frame chart, FPS | ✅ Yes |
-| Widget Inspector | Rebuild counter | ✅ Yes |
-| Memory | RAM usage | ✅ Yes |
-| CPU Profiler | Thread usage | ✅ Yes |
-| Network | API calls | ❌ No |
-| Logging | Console logs | ❌ No |
+### Output 3 — Simple Explanation (4 bullets)
+Why this fix works, what changes in memory, what the user now experiences
 
-### Output 4 — Verify DevTools is Working
-- Tell me exactly what I should see on screen to confirm DevTools is connected properly
-- What the green/grey status indicators mean
+### Output 4 — What to Expect in DevTools After This Fix
+- Which numbers should go down
+- Approximately how much improvement to expect
 
 ---
 
 ## 🎨 STYLE
-- Simple, step-by-step instructions
-- Every terminal command in a code block
-- No jargon without explanation
-- Tone: patient, encouraging, like a senior dev sitting next to me
+- Full file in a dart code block
+- Fix clearly marked with ✅ comment
+- Explanation in simple English — no jargon
+- Tone: clear and encouraging
 
 ---
 ---
 
-# 🔵 PROMPT 2 OF 7 — Profile Bug 1 (ListView loads all items)
+# 🔵 PROMPT 2 OF 10 — Fix Bug 2 (Heavy computation out of build())
 
 ---
 
 ## 🎭 ROLE
-You are a **Flutter performance profiling expert**.
-You specialize in identifying memory and rendering issues caused by unoptimized list widgets.
-You guide beginners through reading Flutter DevTools flame charts and memory graphs.
+You are an **expert Flutter UI performance engineer**.
+You specialize in fixing UI thread blocking issues by moving expensive work out of the widget build cycle.
 
 ---
 
 ## 📋 TASK
-Guide me step by step to **profile Bug 1** in my StockWatch app.
+Help me **fix Bug 2** in my StockWatch app.
 
-**Bug 1:** `stock_list_screen.dart` uses `ListView` instead of `ListView.builder`, which loads all 100 stock tiles into memory at once — even tiles not visible on screen.
+**Bug 2 (current bad code):**
+`stock_detail_screen.dart` has a loop of 1,000,000 iterations running inside the `build()` method — blocking the UI thread every single time the widget rebuilds.
+
+**Fix to apply:**
+Move the computation to `initState()` so it runs only once when the screen loads, not on every rebuild.
 
 ---
 
 ## 🧩 CONTEXT
-- My app is already running in profile mode and DevTools is connected
-- Bug 1 is in `stock_list_screen.dart` — the stock list loads all 100 items at once
-- I need to capture: memory usage, frame build time, number of widgets built
-- I will use these numbers in my final findings report
+- File to change: `lib/screens/stock_detail_screen.dart`
+- The heavy loop was: `for (int i = 0; i < 1000000; i++) { total += i * 0.001; }`
+- After the fix, tapping a stock should feel instant — no delay on screen open
+- I will re-profile this in DevTools after fixing
 
 ---
 
 ## 📏 RULES
-1. Tell me exactly which DevTools tab to go to first
-2. Give me the exact user action to trigger the bug (scroll the list fast, open the screen, etc.)
-3. Tell me exactly what to look for on screen (red bars, high numbers, etc.)
-4. Tell me how to take a screenshot of the proof inside DevTools
-5. Give me a template to fill in my numbers:
-   ```
-   Bug 1 — Before Fix
-   Widgets built on load : ___
-   Memory usage          : ___ MB
-   Frame build time      : ___ ms
-   Dropped frames        : ___
-   ```
-6. Explain WHY these numbers are bad in simple terms
+1. Show the **full updated file**
+2. Move computation to `initState()` and store result in a variable
+3. Mark fix with `// ✅ FIX 2: Moved heavy computation to initState()`
+4. Explain what `initState()` is and when it runs — in 2 simple sentences
+5. Show the bad version vs good version as a comment comparison
+6. Explain why `build()` can be called many times but `initState()` runs only once
 
 ---
 
 ## 📤 OUTPUT
 
-### Output 1 — Step by Step Profiling Instructions for Bug 1
-Numbered steps — exactly what to click, where to look, what to record
+### Output 1 — Before vs After (Code Comparison)
+Bad build() version vs good initState() version
 
-### Output 2 — What Bad Looks Like
-Description of what the flame chart / memory graph looks like when this bug is present
-(Example: "You will see a tall spike at the start — that is Flutter building all 100 tiles at once")
+### Output 2 — Full Updated `lib/screens/stock_detail_screen.dart`
+Complete file with Fix 2 applied
 
-### Output 3 — Numbers Recording Template
-Fill-in template for Bug 1 before-fix numbers
+### Output 3 — Simple Explanation (4 bullets)
+What initState is, why build() is the wrong place, what the user now experiences
 
-### Output 4 — Simple Explanation
-3 bullet points: why this bug happens, what it costs, what the user feels
+### Output 4 — What to Expect in DevTools After This Fix
+Which flame chart bars disappear, how transition time improves
+
+---
+
+## 🎨 STYLE
+- Full file in dart code block
+- Fix clearly marked
+- Simple analogy: "build() is like a chef cooking every time someone looks at the menu — initState() cooks once and keeps it ready"
+- Tone: clear and educational
+
+---
+---
+
+# 🔵 PROMPT 3 OF 10 — Fix Bug 3 (Remove setState from scroll listener)
+
+---
+
+## 🎭 ROLE
+You are an **expert Flutter state management and rendering engineer**.
+You specialize in eliminating unnecessary widget rebuilds caused by misused `setState` calls.
+
+---
+
+## 📋 TASK
+Help me **fix Bug 3** in my StockWatch app.
+
+**Bug 3 (current bad code):**
+`stock_list_screen.dart` has a `ScrollController` that calls `setState(() {})` on every scroll event — forcing the entire screen to rebuild on every single frame while scrolling, even though nothing on screen actually changes.
+
+**Fix to apply:**
+Remove the unnecessary `setState` call from the scroll listener entirely. If scroll position is needed for UI (like a "scroll to top" button), use a more targeted approach that doesn't rebuild the whole screen.
+
+---
+
+## 🧩 CONTEXT
+- File to change: `lib/screens/stock_list_screen.dart`
+- This file also had Fix 1 applied in the previous step — keep that fix
+- After this fix, scrolling the stock list should be buttery smooth at 60 FPS
+- I will re-profile scrolling in DevTools after this fix
+
+---
+
+## 📏 RULES
+1. Show the **full updated file** with both Fix 1 and Fix 3 applied
+2. Remove the bad scroll listener entirely OR replace with a `ValueNotifier` pattern if scroll position is needed
+3. Mark fix with `// ✅ FIX 3: Removed unnecessary setState from scroll listener`
+4. Keep `ScrollController` if it's needed for scroll-to-top button — just remove the setState inside it
+5. Explain what happens to FPS when setState is removed from scroll
+6. After the code, show the before vs after rebuild count as a comment
+
+---
+
+## 📤 OUTPUT
+
+### Output 1 — Before vs After (Code Comparison)
+Bad scroll listener vs clean scroll listener
+
+### Output 2 — Full Updated `lib/screens/stock_list_screen.dart`
+Complete file with Fix 1 + Fix 3 both applied, cleanly commented
+
+### Output 3 — Simple Explanation (4 bullets)
+What setState does to the widget tree, why scroll is the worst place to call it, FPS impact
+
+### Output 4 — What to Expect in DevTools After This Fix
+Expected FPS improvement, expected drop in rebuild count per scroll session
+
+---
+
+## 🎨 STYLE
+- Full file in dart code block
+- Both fixes clearly labeled (✅ FIX 1 and ✅ FIX 3)
+- Simple analogy for setState: "Calling setState on scroll is like refreshing your entire browser tab every time you move your mouse"
+- Tone: clear and practical
+
+---
+---
+
+# 🔵 PROMPT 4 OF 10 — Fix Bug 4 (Add const constructors back)
+
+---
+
+## 🎭 ROLE
+You are an **expert Flutter widget optimization engineer**.
+You specialize in const widget optimization and helping developers understand Flutter's element tree caching system.
+
+---
+
+## 📋 TASK
+Help me **fix Bug 4** in my StockWatch app.
+
+**Bug 4 (current bad code):**
+All `const` constructors have been removed from `StockTile` widget in `stock_tile.dart`. Without `const`, Flutter cannot cache any part of the widget tree — so every sub-widget (icons, padding, text styles) is rebuilt from scratch on every frame.
+
+**Fix to apply:**
+Add `const` constructors back to all widgets inside `StockTile` that are static and never change — icons, padding, text styles, sized boxes, dividers.
+
+---
+
+## 🧩 CONTEXT
+- File to change: `lib/widgets/stock_tile.dart`
+- Also check `lib/screens/portfolio_screen.dart` for missing const widgets
+- This is the most subtle fix — the user barely feels it but DevTools rebuild count drops significantly
+- After fixing, I will compare total rebuild count in Widget Inspector
+
+---
+
+## 📏 RULES
+1. Show the **full updated `stock_tile.dart`** with all possible `const` keywords added back
+2. Mark with `// ✅ FIX 4: Added const constructors to prevent unnecessary rebuilds`
+3. Show a clear comment explaining which widgets CAN be const (static) vs which CANNOT (dynamic — uses stock data)
+4. Also show the updated `portfolio_screen.dart` with const fixes
+5. Rule of thumb: any widget that doesn't use a variable = can be const
+6. After code, list exactly which widgets got const added and why
+
+---
+
+## 📤 OUTPUT
+
+### Output 1 — const Rules (Simple Guide)
+```dart
+// ✅ CAN be const — never changes
+const Icon(Icons.arrow_upward, color: Colors.green)
+const SizedBox(height: 8)
+const EdgeInsets.all(16)
+
+// ❌ CANNOT be const — uses variable data
+Text(stock.name)      // changes per stock
+Text('₹${stock.price}') // changes per stock
+```
+
+### Output 2 — Full Updated `lib/widgets/stock_tile.dart`
+Every possible const keyword added, clearly commented
+
+### Output 3 — Full Updated `lib/screens/portfolio_screen.dart`
+const fixes applied here too
+
+### Output 4 — Simple Explanation (4 bullets)
+What const saves Flutter from doing, rebuild count impact, why it matters at scale
+
+### Output 5 — What to Expect in DevTools After This Fix
+Expected rebuild count reduction in Widget Inspector
+
+---
+
+## 🎨 STYLE
+- Full files in dart code blocks
+- const additions highlighted with inline comments
+- Analogy: "const is like a saved photo — Flutter takes it once and never redraws it"
+- Tone: precise and educational
+
+---
+---
+
+# 🔵 PROMPT 5 OF 10 — Re-Profile All 4 Fixes (Get After Numbers)
+
+---
+
+## 🎭 ROLE
+You are a **Flutter DevTools profiling expert**.
+You guide engineers through post-fix profiling to validate that performance improvements are real and measurable.
+
+---
+
+## 📋 TASK
+Guide me to **re-profile all 4 fixed bugs** in Flutter DevTools to capture my "after" numbers.
+These after numbers + the Day 3 before numbers = my complete before vs after proof for the report.
+
+---
+
+## 🧩 CONTEXT
+- All 4 bugs are now fixed
+- App is clean and running well
+- I need to run the same profiling steps from Day 3 — but now capture the improved numbers
+- I will put both before and after numbers into my final report
+- Device: Android emulator, VS Code
+
+---
+
+## 📏 RULES
+1. Tell me to run the app in **profile mode** again (same as Day 3)
+2. For each bug, give me the exact same action to trigger as Day 3 — so the comparison is fair
+3. Tell me to fill in the "after" column in my profiling notes
+4. Tell me what a "good" number looks like for each metric
+5. Tell me what to do if the numbers didn't improve (troubleshooting tips)
+6. Give me the complete before vs after comparison table to fill in
+
+---
+
+## 📤 OUTPUT
+
+### Output 1 — Re-Profiling Commands
+```bash
+flutter run --profile
+```
+Step by step setup same as Day 3
+
+### Output 2 — Re-Profile Each Bug (4 steps)
+For each bug: exact action to trigger + which DevTools tab + what to record
+
+### Output 3 — Complete Before vs After Table Template
+
+| Metric | Bug | Before | After | Improvement |
+|---|---|---|---|---|
+| Memory on load | Bug 1 | ___ MB | ___ MB | ___ % |
+| Screen open time | Bug 2 | ___ ms | ___ ms | ___ ms faster |
+| FPS while scrolling | Bug 3 | ___ fps | ___ fps | +___ fps |
+| Rebuild count | Bug 4 | ___ | ___ | -___ rebuilds |
+
+### Output 4 — Troubleshooting: What if Numbers Didn't Improve?
+3 common reasons why numbers might not change + how to fix each
+
+### Output 5 — How to Know Your Fix Worked
+Exact visual signs in DevTools that confirm each bug is fixed
 
 ---
 
 ## 🎨 STYLE
 - Step by step numbered instructions
-- Use arrow notation for navigation: `DevTools → Memory tab → Record`
-- Explain every number in plain English
-- Tone: clear, calm, educational
+- Use → arrows for DevTools navigation
+- Comparison table clearly formatted
+- Tone: methodical and precise — like a QA engineer
 
 ---
 ---
 
-# 🔵 PROMPT 3 OF 7 — Profile Bug 2 (Heavy computation in build())
+# 🔵 PROMPT 6 OF 10 — Write the Findings Report (Markdown Draft)
 
 ---
 
 ## 🎭 ROLE
-You are a **Flutter CPU performance expert**.
-You specialize in identifying UI thread blocking issues using Flutter DevTools CPU Profiler and Performance tabs.
-You explain flame charts to beginners in the simplest possible way.
+You are a **technical report writing expert** who helps junior engineers write clear, professional performance findings documents.
+You write reports that impress senior engineers and interviewers — not overly formal, but structured and evidence-based.
 
 ---
 
 ## 📋 TASK
-Guide me step by step to **profile Bug 2** in my StockWatch app.
-
-**Bug 2:** `stock_detail_screen.dart` has a loop of 1,000,000 iterations running inside the `build()` method. This blocks the UI thread every time the screen rebuilds, causing jank and slow screen transitions.
+Help me write the **complete performance findings report** for my StockWatch Flutter app.
+This report will be saved as `docs/performance_report.md` and also converted to PDF.
 
 ---
 
 ## 🧩 CONTEXT
-- DevTools is already open and connected
-- Bug 2 is in `stock_detail_screen.dart`
-- Trigger: tap any stock in the list → detail screen opens slowly
-- I need to capture: frame build time, UI thread time, CPU usage spike
-- These numbers go into my internship findings report
+- I profiled 4 bugs before and after fixing them
+- I have screenshots saved in `docs/screenshots/`
+- I have before and after numbers from Flutter DevTools
+- This report is for my Flutter performance engineering internship at 5paisa Capital
+- The report should be professional enough to show in an interview
 
 ---
 
 ## 📏 RULES
-1. Tell me to use the **Performance tab** AND the **CPU Profiler tab** for this bug
-2. Explain how to start and stop a recording in DevTools
-3. Tell me the exact action to trigger the bug (tap the stock, go back, tap again)
-4. Explain what a **flame chart** is in 2 simple sentences before showing how to read it
-5. Tell me what "UI thread" and "Raster thread" mean in simple words
-6. Give me the numbers template to fill in
+1. Write the **complete `docs/performance_report.md`** file — ready to copy-paste
+2. Structure: Cover → Summary → Bug 1 report → Bug 2 → Bug 3 → Bug 4 → Conclusion
+3. Each bug section must have: Issue, Root Cause, Fix Applied, Before Metric, After Metric, Screenshot reference
+4. Use a standard 4-line finding format for each bug:
+   ```
+   Issue    : [what was wrong]
+   Cause    : [why it happened]
+   Fix      : [what was changed]
+   Result   : [before → after improvement]
+   ```
+5. Write in professional but simple English — no overly complex words
+6. Use placeholder text `[YOUR NUMBER HERE]` for all metrics (I will fill in my real numbers)
+7. Include a "Tools Used" section and a "Key Learnings" section at the end
 
 ---
 
 ## 📤 OUTPUT
 
-### Output 1 — What is a Flame Chart (Simple Explanation)
-2–3 sentences max, beginner friendly
+### Output 1 — Complete `docs/performance_report.md`
 
-### Output 2 — Step by Step Profiling for Bug 2
-Exact numbered steps — record → trigger → stop → read
-
-### Output 3 — Reading the Flame Chart
-- What the tall orange/red bars mean
-- Where to find the "heavy computation" loop in the chart
-- How to identify which function is eating the most time
-
-### Output 4 — Numbers Recording Template
+Full markdown file with this structure:
 ```
-Bug 2 — Before Fix
-Screen transition time : ___ ms
-UI thread frame time   : ___ ms
-Jank frames            : ___
-CPU spike              : ___%
+# StockWatch — Flutter Performance Audit Report
+
+## Project Overview
+## Tools Used
+## Summary of Findings (table of all 4 bugs)
+## Bug 1 — ListView Performance Issue
+## Bug 2 — Build Method Computation Issue
+## Bug 3 — Unnecessary setState Issue
+## Bug 4 — Missing const Constructors
+## Overall Before vs After Comparison
+## Key Learnings
+## Conclusion
 ```
 
-### Output 5 — Simple Explanation
-3 bullets: why build() is the wrong place for heavy work, what it costs, what the user feels
+### Output 2 — Summary Table (filled structure)
+| Bug | Issue | Fix | Improvement |
+|---|---|---|---|
+
+### Output 3 — Key Learnings Section
+5 short, genuine learnings a performance engineering intern would actually write
 
 ---
 
 ## 🎨 STYLE
-- Use simple analogies (example: "the flame chart is like a receipt showing which function spent the most time")
-- Every step numbered
-- Navigation shown as: `DevTools → CPU Profiler → Record`
-- Tone: patient mentor explaining to a first-timer
+- Professional markdown — clean headings, tables, code snippets for fixes
+- Placeholder text in `[SQUARE BRACKETS]` for all numbers
+- Screenshot references like: `![Bug 1 Memory Spike](screenshots/bug1_memory_spike.png)`
+- Tone: confident junior engineer who did real work
+- Length: detailed but not bloated — 2–3 sentences per section description
 
 ---
 ---
 
-# 🔵 PROMPT 4 OF 7 — Profile Bug 3 (setState on every scroll)
+# 🔵 PROMPT 7 OF 10 — Convert Report to PDF
 
 ---
 
 ## 🎭 ROLE
-You are a **Flutter widget rebuild optimization expert**.
-You specialize in identifying unnecessary `setState` calls and widget rebuild storms using Flutter DevTools Widget Inspector and Performance tab.
+You are a **technical documentation expert** who helps developers convert markdown reports into clean, professional PDFs.
 
 ---
 
 ## 📋 TASK
-Guide me step by step to **profile Bug 3** in my StockWatch app.
-
-**Bug 3:** `stock_list_screen.dart` calls `setState(() {})` on every scroll event via a `ScrollController`. This triggers a full-screen rebuild on every single frame while scrolling — even though nothing on the screen has actually changed.
+Help me **convert my `docs/performance_report.md` into a PDF** that I can attach to my GitHub repo and show in the interview.
 
 ---
 
 ## 🧩 CONTEXT
-- DevTools is connected
-- Bug 3 is in `stock_list_screen.dart` — scroll the stock list to trigger it
-- I need to capture: rebuild count, FPS while scrolling, dropped frames
-- The Widget Inspector has a "rebuild count" feature I need to use today
+- I have the markdown report ready at `docs/performance_report.md`
+- I am on Windows/Mac with VS Code
+- I want a clean PDF — not a messy auto-converted one
+- The PDF goes in `docs/performance_report.pdf`
+- I will also add a link to it in my README
 
 ---
 
 ## 📏 RULES
-1. Show me how to enable **"Track widget rebuilds"** in Widget Inspector
-2. Tell me to scroll the list fast for 5 seconds to trigger the bug
-3. Show me where the rebuild count number appears in DevTools
-4. Tell me to check the **Performance tab** simultaneously for dropped frames
-5. Explain what "60 FPS" means and why dropping below it feels bad to the user
-6. Give me the numbers template
+1. Give me **3 ways** to convert markdown to PDF — ordered from easiest to best quality
+2. For each method, give exact steps
+3. Tell me which method gives the most professional-looking output
+4. Tell me how to add page numbers and a title to the PDF if possible
+5. Tell me how to verify the PDF looks good before submitting
 
 ---
 
 ## 📤 OUTPUT
 
-### Output 1 — Enable Widget Rebuild Tracking
-Step by step: how to turn on rebuild tracking in Widget Inspector
+### Output 1 — Method 1: VS Code Extension (Easiest)
+Step by step using "Markdown PDF" VS Code extension
 
-### Output 2 — Step by Step Profiling for Bug 3
-Exact steps: scroll → observe → record numbers
-
-### Output 3 — What Bad Looks Like
-- What you see in Widget Inspector when setState is called too often
-- What the FPS graph looks like during heavy scrolling with this bug
-
-### Output 4 — Numbers Recording Template
+### Output 2 — Method 2: Pandoc (Best Quality)
+```bash
+# Install and convert command
+pandoc docs/performance_report.md -o docs/performance_report.pdf
 ```
-Bug 3 — Before Fix
-Rebuilds per scroll session : ___
-Average FPS while scrolling : ___
-Dropped frames (5 sec)      : ___
-Frame build time (avg)      : ___ ms
-```
+Step by step with exact commands
 
-### Output 5 — Simple Explanation
-3 bullets: what setState does, why calling it every frame is wrong, what the user feels
+### Output 3 — Method 3: GitHub Pages / Online Tool (No install)
+Using tools like md2pdf.eu or similar
+
+### Output 4 — PDF Quality Checklist
+Things to check before finalizing:
+```
+[ ] All tables display correctly
+[ ] Screenshots are visible
+[ ] Headings are properly formatted
+[ ] Page numbers present
+[ ] Font is readable
+```
 
 ---
 
 ## 🎨 STYLE
-- Use a simple analogy for setState (example: "calling setState every scroll is like repainting your entire house every time you open a window")
 - Step by step numbered
-- Tone: clear and friendly
+- Commands in code blocks
+- Tone: practical and direct
 
 ---
 ---
 
-# 🔵 PROMPT 5 OF 7 — Profile Bug 4 (No const constructors)
+# 🔵 PROMPT 8 OF 10 — Final GitHub Push & Repo Polish
 
 ---
 
 ## 🎭 ROLE
-You are a **Flutter widget tree optimization expert**.
-You specialize in const widget optimization and helping developers understand how Flutter's rendering pipeline works.
+You are a **senior software engineer and GitHub expert**.
+You help junior developers publish clean, professional GitHub repositories that make a strong impression on recruiters and interviewers.
 
 ---
 
 ## 📋 TASK
-Guide me step by step to **profile Bug 4** in my StockWatch app.
-
-**Bug 4:** All `const` constructors have been removed from `StockTile` widget. This means Flutter cannot cache any part of the widget — it rebuilds every single sub-widget from scratch on every frame, even widgets that never change (like icons, static text, containers).
+Help me **finalize and publish my StockWatch GitHub repo** so it looks professional and complete.
+I want the repo to look like the work of a serious intern — not a messy beginner project.
 
 ---
 
 ## 🧩 CONTEXT
-- DevTools is connected
-- Bug 4 is in `stock_tile.dart` — affects all 100 tiles in the list
-- This bug is subtle — the app doesn't feel very different but DevTools shows many extra rebuilds
-- I need to use Widget Inspector to see the rebuild count difference
+- Repo name: `stockwatch-flutter-perf-audit`
+- I have: Flutter code, profiling notes, PDF report, screenshots
+- I need to: update README, organize folders, write final commit, check everything
+- This repo will be shown during my 5paisa Capital internship interview
+- I am a beginner — guide me through every git command
 
 ---
 
 ## 📏 RULES
-1. Explain what `const` does in Flutter in 2 simple sentences before the steps
-2. Show how Widget Inspector rebuild count looks different with vs without `const`
-3. Tell me to scroll the list and observe total rebuild count
-4. Explain why this bug matters even if the user can't feel it
-5. Give me the numbers template
-6. This is the most subtle bug — tell me what to look for carefully
+1. Give me the **final folder structure** the repo should have
+2. Give me the **exact git commands** to commit and push everything
+3. Tell me how to update README.md to link to the PDF report
+4. Tell me how to add a proper `.gitignore` for Flutter
+5. Give me the final commit message (professional, not "final changes lol")
+6. Tell me how to add a GitHub repo description and topics (flutter, performance, devtools)
+7. Check: what files should NOT be pushed to GitHub (build folder, etc.)
 
 ---
 
 ## 📤 OUTPUT
 
-### Output 1 — What const Does (Simple Explanation)
-2 sentences max — explain like I am 16 years old
-
-### Output 2 — Step by Step Profiling for Bug 4
-Exact steps to measure rebuild count with no const
-
-### Output 3 — What to Look For
-- Which number in Widget Inspector shows the problem
-- How to compare "expected rebuilds" vs "actual rebuilds"
-
-### Output 4 — Numbers Recording Template
+### Output 1 — Final Repo Folder Structure
 ```
-Bug 4 — Before Fix
-Total widget rebuilds (5 sec scroll) : ___
-StockTile rebuild count              : ___
-Expected rebuild count (with const)  : ___
-Difference                           : ___
-```
-
-### Output 5 — Simple Explanation
-3 bullets: what const saves, what happens without it, why it matters at scale
-
----
-
-## 🎨 STYLE
-- Use the analogy: "const is like a photo — Flutter takes a photo of the widget once and reuses it instead of redrawing it every time"
-- Step by step numbered
-- Tone: encouraging — this is the hardest bug to see, reassure the student
-
----
----
-
-# 🔵 PROMPT 6 OF 7 — Capture All Screenshots & Organize Evidence
-
----
-
-## 🎭 ROLE
-You are a **technical documentation expert** who helps engineers organize profiling evidence into a clean, structured format ready for a findings report.
-
----
-
-## 📋 TASK
-Help me **organize all the profiling data I collected** from Bugs 1–4 into a single structured evidence file. I will use this as the input for my final PDF report tomorrow (Day 4).
-
----
-
-## 🧩 CONTEXT
-- I have profiled all 4 bugs using Flutter DevTools
-- I have numbers filled into each bug's template
-- I have screenshots saved on my computer
-- I need to organize everything into one clean markdown file called `profiling_notes.md`
-- This file will be in my `docs/` folder in the GitHub repo
-
----
-
-## 📏 RULES
-1. Create a clean markdown template for `docs/profiling_notes.md`
-2. One section per bug — with fields for: numbers, screenshot filename, observation notes
-3. Include a "Summary Comparison Table" at the top showing all 4 bugs side by side
-4. Include a section for "My Observations" — free text where I write what I noticed
-5. Leave placeholder text like `[FILL IN YOUR NUMBER HERE]` so I can complete it
-6. File must be beginner-friendly — clear headings, no technical jargon
-
----
-
-## 📤 OUTPUT
-
-### Output 1 — Complete `docs/profiling_notes.md` template
-
-With this structure:
-```
-# StockWatch — Performance Profiling Notes (Before Fix)
-## Summary Table (all 4 bugs)
-## Bug 1 — ListView Issue
-## Bug 2 — Heavy build() Issue
-## Bug 3 — setState Issue
-## Bug 4 — No const Issue
-## Overall Observations
+stockwatch-flutter-perf-audit/
+├── lib/
+│   ├── main.dart
+│   ├── data/
+│   ├── screens/
+│   └── widgets/
+├── docs/
+│   ├── performance_report.md
+│   ├── performance_report.pdf
+│   ├── profiling_notes.md
+│   └── screenshots/
+│       ├── bug1_memory_spike.png
+│       ├── bug2_flamechart_cpu.png
+│       ├── bug3_fps_drop.png
+│       └── bug4_rebuild_count.png
+├── .gitignore
+├── pubspec.yaml
+└── README.md
 ```
 
-### Output 2 — Screenshot Naming Convention
-Tell me exactly what to name each screenshot file so it's organized:
-```
-screenshots/
-├── bug1_memory_spike.png
-├── bug2_flamechart_cpu.png
-├── bug3_fps_drop.png
-├── bug4_rebuild_count.png
-```
+### Output 2 — Flutter .gitignore Content
+Complete `.gitignore` for Flutter projects
 
-### Output 3 — Day 3 Git Commit Message
-The exact commit message to use when pushing today's work:
+### Output 3 — Final Git Commands
 ```bash
 git add .
 git commit -m "..."
-git push
+git push origin main
 ```
+With professional commit message
+
+### Output 4 — README Update
+The exact lines to add to README linking to the PDF report and screenshots
+
+### Output 5 — GitHub Repo Settings
+- Description to add
+- Topics/tags to add: `flutter`, `performance`, `devtools`, `mobile`, `internship`
+- How to add them in GitHub UI
 
 ---
 
 ## 🎨 STYLE
-- Clean markdown with emoji section headers
-- All placeholder text in `[SQUARE BRACKETS]`
-- Tone: organized, professional, like a senior engineer reviewing your notes
+- All commands in code blocks
+- Folder structure as a tree
+- Tone: professional, like a senior reviewing your PR before merge
 
 ---
 ---
 
-# 🔵 PROMPT 7 OF 7 — Day 3 Review & Day 4 Preparation
+# 🔵 PROMPT 9 OF 10 — Interview Preparation (Technical Questions)
 
 ---
 
 ## 🎭 ROLE
-You are a **Flutter performance engineering mentor** doing an end-of-day review with a student.
-You check that the student has completed everything correctly and help them prepare for the next day.
+You are a **technical interview coach** specializing in mobile performance engineering internship interviews.
+You know exactly what interviewers at fintech companies like 5paisa Capital ask candidates about Flutter performance.
+You help candidates answer confidently using the STAR method (Situation → Task → Action → Result).
 
 ---
 
 ## 📋 TASK
-Review my Day 3 work and help me prepare for **Day 4 — Fixing all bugs and measuring improvements**.
+Prepare me for the **Round 2 Technical Interview** for the Flutter Performance Engineer Intern role at 5paisa Capital by:
+1. Giving me the most likely interview questions about this project
+2. Giving me strong, confident answers based on what I built
+3. Coaching me on how to explain my DevTools profiling work
 
 ---
 
 ## 🧩 CONTEXT
-- I have completed profiling all 4 bugs
-- I have filled in `docs/profiling_notes.md` with my numbers and screenshots
-- Tomorrow I will fix all 4 bugs and re-profile to get "after" numbers
-- I am building this for a Flutter performance engineering internship
+- I built StockWatch — a Flutter app with 4 intentional performance bugs that I profiled and fixed
+- I used: Flutter DevTools, Performance tab, CPU Profiler, Widget Inspector
+- I have a PDF findings report and a GitHub repo
+- I am a beginner — this is my first real performance engineering project
+- Interview is online, technical, 30–45 minutes
 
 ---
 
 ## 📏 RULES
-1. Give me a **Day 3 Checklist** to verify everything is done
-2. Give me a **preview of Day 4** — what exactly I will do tomorrow
-3. Tell me the 4 fixes I will apply tomorrow (one per bug) — just names, no code yet
-4. Tell me what "before vs after" comparison will look like
-5. Give me one tip to make Day 4 go faster
+1. Give me **8 likely interview questions** — mix of conceptual and project-based
+2. For each question, give a **strong model answer** based specifically on my StockWatch project
+3. Use the STAR format for project questions (Situation, Task, Action, Result)
+4. For conceptual questions, give a simple clear definition + one example from my project
+5. Tell me what to say when I don't know an answer
+6. Give me 2 questions I should ask the interviewer at the end
 
 ---
 
 ## 📤 OUTPUT
 
-### Output 1 — ✅ Day 3 Complete Checklist
-```
-[ ] App ran in profile mode without crashing
-[ ] DevTools connected successfully
-[ ] Bug 1 profiled — numbers recorded
-[ ] Bug 2 profiled — numbers recorded
-[ ] Bug 3 profiled — numbers recorded
-[ ] Bug 4 profiled — numbers recorded
-[ ] 4 screenshots saved with correct names
-[ ] profiling_notes.md filled in and saved
-[ ] Changes committed to GitHub
-```
+### Output 1 — 8 Likely Interview Questions with Model Answers
 
-### Output 2 — 👀 Day 4 Preview
-What happens tomorrow — fixing bugs + re-profiling for "after" numbers
+**Q1: Tell me about your project.**
+**Q2: What is jank in Flutter and how did you identify it?**
+**Q3: What is the difference between ListView and ListView.builder?**
+**Q4: Why should you avoid heavy computation in the build() method?**
+**Q5: What is Flutter DevTools and which tabs did you use?**
+**Q6: What is setState and when should you NOT use it?**
+**Q7: What are const constructors and why do they improve performance?**
+**Q8: What was your biggest learning from this project?**
 
-### Output 3 — The 4 Fixes (Names Only)
-| Bug | Fix Name |
-|---|---|
-| Bug 1 | Switch back to ListView.builder |
-| Bug 2 | Move computation outside build() |
-| Bug 3 | Remove setState from scroll listener |
-| Bug 4 | Add const constructors back |
+### Output 2 — What to Say When You Don't Know
+A confident, honest script for when you're asked something you don't know
 
-### Output 4 — One Power Tip for Day 4
-A single most important tip to make tomorrow's profiling faster and more accurate
+### Output 3 — 2 Questions to Ask the Interviewer
+Smart questions that show you are interested in performance engineering
+
+### Output 4 — 60-Second Project Summary (Memorize This)
+A single polished paragraph to say when they ask "Tell me about your project" — use exact numbers from your DevTools profiling
 
 ---
 
 ## 🎨 STYLE
-- Checklist format for Output 1
-- Encouraging, motivating tone — student is almost done!
-- Keep it short and energizing — Day 3 was heavy work, end on a high note
+- Each Q&A clearly separated
+- Model answers in quotes or a box — ready to read and memorize
+- STAR format clearly labeled for project questions
+- Tone: confident, humble, genuine — not over-rehearsed
+
+---
+---
+
+# 🔵 PROMPT 10 OF 10 — Final Project Completion Review
 
 ---
 
-# 🏁 Day 3 Complete — You Did the Hard Part!
+## 🎭 ROLE
+You are a **senior Flutter performance engineer and mentor** doing the final review of a student's internship project.
+You check that everything is complete, professional, and interview-ready.
+You give honest feedback and a final score.
 
-> By end of Day 3 you have:
-> - ✅ Profiled 4 real bugs using industry-standard tools
-> - ✅ Captured proof with screenshots and numbers
-> - ✅ Written structured profiling notes
-> - ✅ Done what actual performance engineers do at companies like 5paisa
+---
 
-> Tomorrow: Fix everything. Measure the improvement. See the numbers go green. 🚀
+## 📋 TASK
+Do a **complete final review** of my StockWatch project and confirm it is 100% ready for the 5paisa Capital internship interview.
+
+---
+
+## 🧩 CONTEXT
+- I completed the project over 4 days
+- Day 1: Built clean Flutter app
+- Day 2: Added 4 performance bugs
+- Day 3: Profiled bugs with Flutter DevTools
+- Day 4: Fixed all bugs, re-profiled, wrote report, published GitHub repo
+- I have: working app, profiling notes, PDF report, clean GitHub repo, interview answers ready
+
+---
+
+## 📏 RULES
+1. Give me the **complete 4-day project checklist** — every deliverable from all 4 days
+2. Rate my project readiness out of 10 — and what would make it a 10/10
+3. Tell me the 3 most impressive things about this project from an interviewer's perspective
+4. Tell me if there is anything I should add or improve before the interview
+5. Give me a final motivational summary — what I actually learned and achieved
+
+---
+
+## 📤 OUTPUT
+
+### Output 1 — Complete 4-Day Checklist
+```
+DAY 1 ✅
+[ ] Flutter app created with 3 screens
+[ ] Fake stock data with 20+ stocks
+[ ] ListView.builder, navigation, bottom nav working
+[ ] Code pushed to GitHub
+
+DAY 2 ✅
+[ ] Bug 1 added — ListView loads all items
+[ ] Bug 2 added — Heavy loop in build()
+[ ] Bug 3 added — setState on every scroll
+[ ] Bug 4 added — No const constructors
+[ ] All bugs marked with 🐛 comments
+[ ] App still runs after bugs
+
+DAY 3 ✅
+[ ] App profiled in profile mode
+[ ] Bug 1 profiled — numbers recorded
+[ ] Bug 2 profiled — flame chart captured
+[ ] Bug 3 profiled — FPS drop recorded
+[ ] Bug 4 profiled — rebuild count recorded
+[ ] 4 screenshots saved
+[ ] profiling_notes.md filled in
+
+DAY 4 ✅
+[ ] Bug 1 fixed — ListView.builder restored
+[ ] Bug 2 fixed — computation moved to initState
+[ ] Bug 3 fixed — setState removed from scroll
+[ ] Bug 4 fixed — const constructors added back
+[ ] All 4 bugs re-profiled for after numbers
+[ ] performance_report.md written
+[ ] performance_report.pdf generated
+[ ] GitHub repo published and clean
+[ ] README links to PDF report
+[ ] Interview answers prepared
+```
+
+### Output 2 — Project Readiness Score
+X / 10 with specific feedback on what makes it strong
+
+### Output 3 — Top 3 Impressive Things
+From an interviewer's perspective — what stands out
+
+### Output 4 — Final Motivational Summary
+What the student actually learned and achieved in 4 days — genuine and specific
+
+---
+
+## 🎨 STYLE
+- Checklist format with emoji
+- Honest, direct score with reasoning
+- Final summary should feel genuine and earned — not generic
+- Tone: proud mentor sending a student into their interview with full confidence
+
+---
+
+# 🏆 PROJECT COMPLETE — StockWatch Flutter Performance Audit
+
+> In 4 days you went from zero to:
+> - ✅ A real Flutter app with 3 screens
+> - ✅ 4 real performance bugs — profiled with industry tools
+> - ✅ 4 fixes with measurable before/after proof
+> - ✅ A professional findings report (PDF)
+> - ✅ A clean GitHub repo an interviewer can open right now
+> - ✅ Confident answers to technical interview questions
+>
+> You didn't just build a project.
+> You did exactly what performance engineers do at companies like 5paisa every day. 🚀

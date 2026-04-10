@@ -83,11 +83,19 @@ class _StockListScreenState extends State<StockListScreen> {
           ),
           // Stock List
           Expanded(
-            // 🐛 BUG 1: Using ListView instead of ListView.builder
-            // ✅ CLEAN VERSION WAS: ListView.builder (efficiently loads only visible items)
-            child: ListView(
+            // ✅ FIX 1: Using ListView.builder for lazy loading
+            // This efficiently builds only the tiles currently visible on the screen.
+            // As the user scrolls, Flutter 'recycles' or builds new tiles, 
+            // saving massive amounts of memory compared to the standard ListView.
+            
+            // 💡 HOW IT WORKS: 
+            // Instead of building 100 tiles at once in memory, 
+            // itemBuilder is called only when a tile is about to enter the viewport.
+            child: ListView.builder(
               controller: _scrollController,
-              children: filteredStocks.map((stock) {
+              itemCount: filteredStocks.length,
+              itemBuilder: (context, index) {
+                final stock = filteredStocks[index];
                 return StockTile(
                   stock: stock,
                   onTap: () {
@@ -100,7 +108,7 @@ class _StockListScreenState extends State<StockListScreen> {
                     );
                   },
                 );
-              }).toList(),
+              },
             ),
           ),
         ],
