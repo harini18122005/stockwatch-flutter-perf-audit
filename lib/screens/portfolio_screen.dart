@@ -8,6 +8,9 @@ class PortfolioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🐛 BUG 4: Removed const constructors — forces unnecessary rebuilds
+    // ✅ CLEAN VERSION WAS: const constructors for static widgets
+    
     // Hardcoded holdings: 5 stocks with specific quantities
     final List<Map<String, dynamic>> holdings = [
       {'stock': fakeStocks[0], 'quantity': 10}, // Reliance
@@ -27,7 +30,7 @@ class PortfolioScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Portfolio'),
+        title: Text('My Portfolio'),
         backgroundColor: Colors.blue[800],
         foregroundColor: Colors.white,
       ),
@@ -36,8 +39,8 @@ class PortfolioScreen extends StatelessWidget {
           // Portfolio Summary Card
           Container(
             width: double.infinity,
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(24),
+            margin: EdgeInsets.all(16),
+            padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.blue[800],
               borderRadius: BorderRadius.circular(16),
@@ -45,24 +48,24 @@ class PortfolioScreen extends StatelessWidget {
                 BoxShadow(
                   color: Colors.blue.withOpacity(0.3),
                   blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  offset: Offset(0, 5),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Total Portfolio Value',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 16,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(
                   '₹${totalValue.toStringAsFixed(2)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -73,7 +76,7 @@ class PortfolioScreen extends StatelessWidget {
           ),
 
           // Holdings List Header
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               children: [
@@ -99,16 +102,16 @@ class PortfolioScreen extends StatelessWidget {
                 final double currentValue = stock.price * quantity;
 
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: ListTile(
                     title: Text(
                       stock.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text('Qty: $quantity | Symbol: ${stock.symbol}'),
                     trailing: Text(
                       '₹${currentValue.toStringAsFixed(2)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blue,
                       ),

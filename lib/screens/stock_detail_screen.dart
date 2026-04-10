@@ -10,6 +10,16 @@ class StockDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🐛 BUG 2: Heavy computation inside build() method
+    // ✅ CLEAN VERSION WAS: No heavy computation in build()
+    // Simulate heavy work — runs on every rebuild
+    double total = 0;
+    for (int i = 0; i < 1000000; i++) {
+      total += i * 0.001;
+    }
+    // We print it just to ensure the compiler doesn't optimize it away
+    debugPrint('Computation result: $total');
+
     // Generate a simple fake price history (10 items)
     final List<double> priceHistory = List.generate(
       10,

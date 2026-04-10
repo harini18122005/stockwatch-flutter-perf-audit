@@ -15,13 +15,15 @@ class StockTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🐛 BUG 4: Removed const constructors — forces unnecessary rebuilds
+    // ✅ CLEAN VERSION WAS: Using 'const' for EdgeInsets, TextStyle, SizedBox, etc.
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       // Stock Name and Symbol
       title: Text(
         stock.name,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),
@@ -41,15 +43,15 @@ class StockTile extends StatelessWidget {
           // Current Price
           Text(
             '₹${stock.price.toStringAsFixed(2)}',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           // Change Percentage Badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: stock.isUp ? Colors.green[100] : Colors.red[100],
               borderRadius: BorderRadius.circular(4),

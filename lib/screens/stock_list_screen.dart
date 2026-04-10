@@ -17,11 +17,30 @@ class _StockListScreenState extends State<StockListScreen> {
   List<Stock> filteredStocks = [];
   final TextEditingController searchController = TextEditingController();
 
+  // 🐛 BUG 3: Calling setState on every scroll event
+  // ✅ CLEAN VERSION WAS: Normal scroll behavior (no ScrollController needed for setState)
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     // Initially show all stocks
     filteredStocks = fakeStocks;
+
+    // 🐛 BUG 3 Listener: Triggers a rebuild on every single pixel scrolled
+    _scrollController.addListener(() {
+      setState(() {
+        // This empty setState forces the whole widget tree to rebuild 
+        // 60-120 times per second during scrolling!
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    searchController.dispose();
+    super.dispose();
   }
 
   /// Filters the stock list based on the user's search query.
@@ -64,10 +83,11 @@ class _StockListScreenState extends State<StockListScreen> {
           ),
           // Stock List
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredStocks.length,
-              itemBuilder: (context, index) {
-                final stock = filteredStocks[index];
+            // 🐛 BUG 1: Using ListView instead of ListView.builder
+            // ✅ CLEAN VERSION WAS: ListView.builder (efficiently loads only visible items)
+            child: ListView(
+              controller: _scrollController,
+              children: filteredStocks.map((stock) {
                 return StockTile(
                   stock: stock,
                   onTap: () {
@@ -80,7 +100,7 @@ class _StockListScreenState extends State<StockListScreen> {
                     );
                   },
                 );
-              },
+              }).toList(),
             ),
           ),
         ],
